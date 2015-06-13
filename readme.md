@@ -10,6 +10,10 @@ takes a text file with flags that correspond to youtube, yt playlist, bandcamp, 
 
 Renames the files in this folder to strip extra hyphens and stuff. Tells ffmpeg to convert them to mp3 into a folder called 'done'.
 
+### 0.txt
+
+test file of urls. I guess I should have a file of expected outputs to test against?
+
 ### License
 
 WTFPL as described on [its site](www.wtfpl.net). This is just a little string manipulation. I can hardly pretend to feel offended if you don't credit me or whatever. youtube_dl is public domain. ffmpeg is gpl. But, I don't actually bundle them in this software, so no worries.
