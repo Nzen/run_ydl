@@ -1,5 +1,3 @@
-import os
-
 '''
 youtube-dl is great, but it doesn't seem to grab playlist arguments from a batch file.
 As I don't want a whole playlist at once, this module accomodates my prefeence.
@@ -13,45 +11,45 @@ use proper ipc to run ydl and harvest error signals, for retries
  - out to system -
 youtube-dl -f 18 -o "%(upload [...] itle)s.%(ext)s" --playlist-items 6,7,8 [playlist_url]
 '''
+import os
+from sys import argv
 
-def main() :
-	file = open( "1.txt" ) # or your preference, argv also possible
-	playlists = file.readlines()
-	file.close()
-	flags = {
-		'&': ['-f 18 ','yt '],
-		'y' : ['-f 18 ','yt '],
-		'b' : ['','bc '],
-		'd' : ['-f standard ','dm'],
-		'v' : ['-f h264-sd ','vi'],
-		's' : ['','sc ']
-	}
+def main( fileN ) :
 	for_bash = ""
-	specific = ""
 	flag_type = ""
-	command = [
-		"youtube-dl ",
-		"-o \"%(uploader)s ",
-		"%(upload_date)s %(title)s ",
-		".%(ext)s\" --sleep-interval 2 "
-	]
-	exe, format, out_beg, source, o_name, o_end = 0, 0, 1, 1, 2, 3
+	command = [ "youtube-dl -o \"n", " --sleep-interval 2 " ]
+	output = {
+	'&': ' %(uploader)s yt %(upload_date)s %(title)s i%(playlist_index)s.%(ext)s\" -f 18',
+	'y' : ' %(uploader)s yt %(upload_date)s %(title)s.%(ext)s\" -f 18',
+	'b' : ' bc %(title)s.%(ext)s\"',
+	'd' : ' %(uploader)s dm %(upload_date)s %(title)s.%(ext)s\" -f standard',
+	'v' : ' %(uploader)s vi %(upload_date)s %(title)s.%(ext)s\" -f h264-sd',
+	's' : ' %(uploader)s sc %(upload_date)s %(title)s.%(ext)s\"',
+	'n' : ' %(uploader)s ng %(id)s %(title)s.%(ext)s\"'
+	}
+	o_beg, o_end = 0, 1
 	vid_try = 1
-	for whole_line in playlists :
+	file = open( fileN )
+	playlist = file.readlines()
+	file.close()
+	for whole_line in playlist :
 		th_line = whole_line.split( '\t' )[0] # the rest is a comment
 		v_type = th_line[0]
-		for_bash = command[exe] + flags[v_type][format] + command[out_beg] \
-			+ flags[v_type][source] + command[o_name] \
-			+ str(vid_try) + command[o_end]
-		if ( v_type == "&" ) :
+		for_bash = command[o_beg] + str(vid_try) + output[v_type] + command[o_end]
+		if ( v_type == "&" ) : # if you do mor than one, add -i here
 			for_bash += "--playlist-items "
-		for_bash += th_line[2:] # ditch flag and space
+		for_bash += th_line[2:] # ditch flag and space, rest is the link
 		#for_bash = "echo " + for_bash # 4TESTS
 		print
 		os.system( for_bash )
 		vid_try += 1
 
-main()
+try :
+	fileN = argv[ 1 ]
+except IndexError:
+	print " - which file has the urls?"
+	exit( 0 )
+main( fileN )
 
 
 
