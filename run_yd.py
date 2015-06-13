@@ -19,7 +19,7 @@ def main( fileN ) :
 	flag_type = ""
 	command = [ "youtube-dl -o \"n", " --sleep-interval 2 " ]
 	output = {
-	'&': ' %(uploader)s yt %(upload_date)s %(title)s i%(playlist_index)s.%(ext)s\" -f 18',
+	'&': ' %(uploader)s yt %(upload_date)s %(title)s.%(ext)s\" -f 18',
 	'y' : ' %(uploader)s yt %(upload_date)s %(title)s.%(ext)s\" -f 18',
 	'b' : ' bc %(title)s.%(ext)s\"',
 	'd' : ' %(uploader)s dm %(upload_date)s %(title)s.%(ext)s\" -f standard',
@@ -35,11 +35,15 @@ def main( fileN ) :
 	for whole_line in playlist :
 		th_line = whole_line.split( '\t' )[0] # the rest is a comment
 		v_type = th_line[0]
-		for_bash = command[o_beg] + str(vid_try) + output[v_type] + command[o_end]
-		if ( v_type == "&" ) : # if you do mor than one, add -i here
-			for_bash += "--playlist-items "
+		for_bash = command[o_beg] + str(vid_try)
+		if ( v_type == "&" ) : # if you do more than one, add -i here
+			for_bash += " i" + th_line[2:4] + output[v_type] \
+			# grabbing 2 chars, often a space. trim()
+			+ command[o_end] + "--playlist-items "
+		else :
+			for_bash += output[v_type] + command[o_end]
 		for_bash += th_line[2:] # ditch flag and space, rest is the link
-		#for_bash = "echo " + for_bash # 4TESTS
+		for_bash = "echo " + for_bash # 4TESTS
 		print
 		os.system( for_bash )
 		vid_try += 1
