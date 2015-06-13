@@ -6,7 +6,7 @@ License: [WTFPL](www.wtfpl.net)
 Assumptions:
  python 2.7
  ffmpeg installed and on the Path
- no files/folders with a name less than six characters
+ no files/folders with a name less than six characters (except "done")
 
 Usage:
  put this module with the files to convert
@@ -16,6 +16,10 @@ Usage:
  if Attentive flag (to limit cpu heat)
 	need to press a key per 15 conversions, bell signals need
  sounds double bell when finished
+
+uncommitted changes:
+ readme changes for better understanding
+ nagging reminder now more accurate 
 '''
 
 import os
@@ -180,19 +184,24 @@ def countHyAlone( name ) :
 			times += 1
 	return times
 
-def findsMultiHyphen() :
+def foundMultiHyphen() :
 	'shows which files have more than one isolated hyphen'
 	here = os.getcwd()
 	for_bash = ""
 	temp = ""
+	found = 0
 	for thisFile in os.listdir( here ) :
 		# necessary, protected files
 		if thisFile == "ff_run.py" or thisFile == "done":
 			# if os.path.isdir( here + \ + thisFile )
 			continue
 		if countHyAlone( thisFile ) > 1 :
-			print thisFile + '\n'
-	print '\7\7' # double bell when done
+			print thisFile
+			found += 1
+	will_pause = found > 0
+	if will_pause :
+		print '\7\7' # double bell
+	return will_pause
 
 #	-	-	-	-
 
@@ -232,6 +241,9 @@ def new_name( fileExt ) :
 
 def simpleVersion( attentive ) :
 	'for each file except this one, convert to mp3 with ffmpeg'
+	if foundMultiHyphen() :
+		raw_input( "clean up those and I'll run" )
+
 	# CLI > ffmpeg -i "in put.bna" -vn "out put.apl"
 	command = "ffmpeg -i \""
 	out_flag = "\" -vn \"done\\" # done is a preexisting out-folder
@@ -273,7 +285,6 @@ def main() :
 	checkInEvery30Seconds = True # am I willing to baby sit the conversion?
 	simpleVersion( checkInEvery30Seconds )
 	# fsmVersion()
-	# findsMultiHyphen()
 
 main()
 
