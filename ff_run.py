@@ -23,6 +23,8 @@ uncommitted changes:
 '''
 
 import os
+from sys import argv
+from subprocess import call
 
 class Fsm( object ) :
 	'''
@@ -239,7 +241,7 @@ def new_name( fileExt ) :
 		return lit_ind
 	return fileExt[ :lit_ind+1 ] + "mp3"
 
-def simpleVersion( attentive ) :
+def simpleVersion( to_pause ) :
 	'for each file except this one, convert to mp3 with ffmpeg'
 	if foundMultiHyphen() :
 		raw_input( "clean up those and I'll run" )
@@ -270,23 +272,33 @@ def simpleVersion( attentive ) :
 		print for_bash
 		'''
 		processed += 1
-		if attentive and processed > 15 :
+		if processed > to_pause :
 			raw_input( "\7\n pausing to give cpu a breather, press ENTER" )
 			processed = 0
-		os.system( for_bash )
+		try:
+			ydl_answ = call( for_bash, shell = True )
+			if ydl_answ is not 0 :
+				problems.append( for_bash +" :: "+ ydl_answ )
+		except OSError as ose :
+			print "Execution failed:", ose
 	if len( problems ) > 0 :
 		print "\n PROBLEMS: "
-		for nameSigh in range( 0, len( problems ) ) :
-			print problems[ nameSigh ]
+		# for nameSigh in range( 0, len( problems ) ) :
+			# print problems[ nameSigh ]
+		for nameSigh in problems :
+			print nameSigh
 	print '\7\7' # double bell when done
 
-def main() :
+def main( to_pause ) :
 	'choose what this does'
-	checkInEvery30Seconds = True # am I willing to baby sit the conversion?
-	simpleVersion( checkInEvery30Seconds )
+	simpleVersion( to_pause )
 	# fsmVersion()
 
-main()
+try :
+	to_pause = argv[ 1 ]
+except IndexError:
+	to_pause = raw_input( " - how many before I pause? " )
+main( to_pause )
 
 
 

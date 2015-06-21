@@ -1,0 +1,8 @@
+s https://soundcloud.com/cairoky/asmahan-ya-nar-foadi
+y JmcA9LIIXWw	mus
+b http://littlev.bandcamp.com/track/illusive-man
+& 3 PLFFD1C791A86FB485	magic relig ucla
+v https://vimeo.com/54286322	some documentary
+n http://www.newgrounds.com/audio/listen/627043	brain damage
+& 333 PLFFD1C791A86FB485	magic relig ucla
+y https://www.youtube.com/watch?v=x2GpemFeMtI  	intentionally fails

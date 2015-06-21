@@ -1,0 +1,13 @@
+youtube-dl -o "%(uploader)s sc %(upload_date)s %(title)s.%(ext)s" --sleep-interval 2 https://soundcloud.com/cairoky/asmahan-ya-nar-foadi
+
+youtube-dl -o "%(uploader)s yt %(upload_date)s %(title)s.%(ext)s" -f 18 --sleep-interval 2 JmcA9LIIXWw
+
+youtube-dl -o "littlev bc %(title)s.%(ext)s" --sleep-interval 2 http://littlev.bandcamp.com/track/illusive-man
+
+youtube-dl -o "%(uploader)s yt %(upload_date)s %(title)s i3.%(ext)s" -f 18 --sleep-interval 2 --playlist-items 3 PLFFD1C791A86FB485
+
+youtube-dl -o "%(uploader)s vi %(upload_date)s %(title)s.%(ext)s" -f h264-sd --sleep-interval 2 https://vimeo.com/54286322
+
+youtube-dl -o "%(uploader)s ng %(id)s %(title)s.%(ext)s" --sleep-interval 2 http://www.newgrounds.com/audio/listen/627043
+
+youtube-dl -o "%(uploader)s yt %(upload_date)s %(title)s i333.%(ext)s" -f 18 --sleep-interval 2 --playlist-items 333 PLFFD1C791A86FB485
