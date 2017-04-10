@@ -119,7 +119,7 @@ class Fsm( object ) :
 			self.trans = self.rvfX
 
 	def printNext( self ) :
-		print( self.lexToken[ self.trans ], end = ' ' )
+		print self.lexToken[ self.trans ],
 
 	def replace( self, withWhat ) :
 		'''
@@ -143,13 +143,13 @@ class Fsm( object ) :
 
 def removeViaFsm( name ) :
 	'yay optimize'
-	print()
+	print
 	for lett in name :
-		print( lett, end = ' ' )
+		print lett,
 	print
 	state = Fsm( name )
 	state.eval()
-	# print( " ended at " + str( state.curr ) + ", last was " + state.temp )
+	# print " ended at " + str( state.curr ) + ", last was " + state.temp
 	return state.temp # + "mp3"
 
 def fsmVersion() :
@@ -162,12 +162,12 @@ def fsmVersion() :
 		"a..dc.ac" : "a.dc."
 	}
 	result = ""
-	print( "\nlegend: x(\\w) \'(\\s1) \"(\\s2) -(-1) =(-2) .(.1) f(.2)" )
+	print "\nlegend: x(\\w) \'(\\s1) \"(\\s2) -(-1) =(-2) .(.1) f(.2)"
 	#probs = [] # later for test robustness
 	for test in cases :
 		result = removeViaFsm( test )
 		if result != cases[test] :
-			print( '\n>' + result + '< didnt match' )
+			print "\n>" + result + "< didn't match"
 			# currently printing lex tokens above, so no need to print again
 			# currently not editing
 		# don't forget, won't print in order :B
@@ -198,11 +198,11 @@ def foundMultiHyphen() :
 			# if os.path.isdir( here + \ + thisFile )
 			continue
 		if countHyAlone( thisFile ) > 1 :
-			print( thisFile )
+			print thisFile
 			found += 1
 	will_pause = found > 0
 	if will_pause :
-		print( '\7\7' ) # double bell
+		print '\7\7' # double bell
 	return will_pause
 
 #	-	-	-	-
@@ -247,8 +247,8 @@ def simpleVersion( to_pause ) :
 		raw_input( "clean up those and I'll run" )
 
 	# CLI > ffmpeg -i "in put.bna" -vn "out put.apl"
-	command = "avconv -i \""
-	out_flag = "\" -vn -f mp3 \"done/" # done is a preexisting out-folder
+	command = "ffmpeg -i \""
+	out_flag = "\" -vn \"done\\" # done is a preexisting out-folder
 	here = os.getcwd()
 	problems = []
 	processed = 0
@@ -269,7 +269,7 @@ def simpleVersion( to_pause ) :
 		lim += 1
 		if lim > 20 :
 			break
-		print( for_bash )
+		print for_bash
 		'''
 		processed += 1
 		if processed > to_pause :
@@ -278,16 +278,16 @@ def simpleVersion( to_pause ) :
 		try:
 			ydl_answ = call( for_bash, shell = True )
 			if ydl_answ is not 0 :
-				problems.append( for_bash +" :: "+ str(ydl_answ) )
+				problems.append( for_bash +" :: "+ ydl_answ )
 		except OSError as ose :
-			print( "Execution failed:", ose )
+			print "Execution failed:", ose
 	if len( problems ) > 0 :
-		print( '\n PROBLEMS: ' )
+		print "\n PROBLEMS: "
 		# for nameSigh in range( 0, len( problems ) ) :
 			# print problems[ nameSigh ]
 		for nameSigh in problems :
-			print( nameSigh )
-	print( '\7\7' ) # double bell when done
+			print nameSigh
+	print '\7\7' # double bell when done
 
 def main( to_pause ) :
 	'choose what this does'
@@ -298,7 +298,7 @@ try :
 	to_pause = argv[ 1 ]
 except IndexError:
 	to_pause = raw_input( " - how many before I pause? " )
-main( int( to_pause ) )
+main( to_pause )
 
 
 

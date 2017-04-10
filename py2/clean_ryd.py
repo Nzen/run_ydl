@@ -18,7 +18,7 @@ def cleanup( filename ) :
 	# BmSt32 [ bla bla ]nguin i1.mp4   | intended out
 	misnamed = True
 	if not_from_run_yd( filename[ :3] ) :
-		#print( " ---- skipped "+ filename ) # 4TESTS
+		#print " ---- skipped "+ filename # 4TESTS
 		return not misnamed, ""
 	f_letter = 2
 	p_num = "" # playlist number
@@ -29,7 +29,7 @@ def cleanup( filename ) :
 			pl_end = 2 # index is single digit, but next is an extra space
 		p_num = " "+ filename[ f_letter : f_letter +pl_end ] # won't vary
 		f_letter += 4
-		#print( p_num +"|| "+ filename[ :9 ] ) # 4TESTS
+		#print p_num +"|| "+ filename[ :9 ]# 4TESTS
 	ext = filename[ -4:] # .mp4
 	return misnamed, filename[ f_letter : -4 ]+ p_num + ext
 
@@ -42,9 +42,9 @@ def rename( old, new )	:
 		retcode = subprocess.call( command, shell = True )
 		#retcode = subprocess.call( "youtube-dl x2GpemFeMtI",shell=True ) known fail
 		if retcode is not 0 :
-			print( "Returned- ", retcode ) # 0 success, 1 fail, -1 terminated
+			print "Returned- ", retcode # 0 success, 1 fail, -1 terminated
 	except OSError as ose :
-		print( "Execution failed:", ose ) # starts with a space
+		print "Execution failed:", ose # starts with a space
 
 def main() :
 	'get names, clean them, rename'
