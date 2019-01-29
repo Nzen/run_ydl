@@ -43,8 +43,11 @@ public class RunYd
 					+" because "+ ie );
 			return;
 		}
+		int sleepSeconds = 5;
+		if ( args.length > 1 )
+			sleepSeconds = Integer.valueOf( args[ 1 ] );
 		RunYd notCurl = new RunYd();
-		notCurl.download( links );
+		notCurl.download( links, sleepSeconds );
 	}
 
 
@@ -71,14 +74,15 @@ public class RunYd
 	}
 
 
-	public void download( List<String> links )
+	public void download( List<String> links, int sleepSeconds )
 	{
 		final String here = cl +"d ";
 		final int linkInd = 0;
 		// COPYPASTA from run_dl.py
 		final int y_dl = 0, sleep = y_dl +1, b_dl = sleep +1;
 		System.out.println( here +"os "+ System.getProperty( "os.name" ) );
-		String[] command = { "youtube-dl -o \"", " --sleep-interval 5 ",
+		String[] command = { "youtube-dl -o \"",
+							String.format( " --sleep-interval %d ", sleepSeconds ),
 		         			"python3 /usr/local/sbin/bc_dl --base-dir=m"
 		        			+" --template=\"%{genres}/%{artist}/%{album}/%{track} %{title}\" " };
 		if ( ! System.getProperty( "os.name" ).equals( "Linux" ) )
@@ -107,7 +111,7 @@ public class RunYd
 				{
 					String instruction = command[ y_dl ] + typeToTemplate.get( flag )
 							+ command[ sleep ] + linkAndComment[ linkInd ];
-					System.out.println( here +"instruction | "+ instruction );
+					// System.out.println( here +"instruction | "+ instruction );
 					List<String> commandComponents = new LinkedList<String>();
 					// FIX just hardcoding a valid version for the first use case
 					if ( flag.equals( "y" ) )
@@ -120,7 +124,7 @@ public class RunYd
 						commandComponents.add( "-o" );
 						commandComponents.add( "%(uploader)s yt %(upload_date)s %(id)s %(title)s.%(ext)s" );
 						commandComponents.add( "--sleep-interval" );
-						commandComponents.add( "5" );
+						commandComponents.add( Integer.toString( sleepSeconds ) );
 						commandComponents.add( "-f" );
 						commandComponents.add( "18" );
 						commandComponents.add( linkAndComment[ linkInd ] );
