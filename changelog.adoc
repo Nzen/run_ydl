@@ -1,0 +1,32 @@
+
+= RunYdl Changelog
+
+== Unreleased
+
+== [[1.0]] - 2019-08-15
+
+=== Added
+
+* Depends on picocli
+
+=== Changed
+
+* requires a flag `-s` or `--sleep` to indicate the sleep seconds flag.
+
+=== Removes
+
+No longer reports the OS when starting a run.
+
+== [[0.1]] - 2019-01-29
+
+=== Added
+
+* Able to specify seconds of sleep as a second argument.
+
+== [[0.0]] - 2019-06-22
+
+=== Added
+
+* Able to read batch file and call youtube-dl for y,d,v,s
+
+// Added Changed Removed

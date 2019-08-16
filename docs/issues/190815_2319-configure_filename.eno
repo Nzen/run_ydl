@@ -1,0 +1,50 @@
+
+# issue 190815_2319
+
+## body
+
+assignee : Nicholas (Nzen)
+
+title :
+	| Configure youtube-dl invocation
+
+status : in progress
+
+priority : medium
+
+-- desc
+RunYdl currently has a fixed number hardcoded templates it recognizes. These correspond to hardcoded resulting invocations of youtube-dl. These may not suit a given use case and changing them requires recompiling the jar.
+
+Provide a means of defining these outside of the java source.
+-- desc
+
+labels:
+
+## 190815 2324 cst
+
+comment author : Nicholas
+
+-- comment
+I think I'll use eno to configure it, or fall back to the hardcoded templates if the user doesn't specify any.
+-- comment
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

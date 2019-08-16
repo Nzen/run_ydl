@@ -3,64 +3,59 @@ package ws.nzen.runtime.youtube_dl;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+
 /**  */
-public class RunYd
+@Command(
+		description = "Batch processor of links for youtube-dl",
+		name = "RunYdl",
+		version = "RunYdl 1.0",
+		mixinStandardHelpOptions = true )
+public class RunYd implements Runnable
 {
 	private static final String cl = "ry.";
 	private Map<String, String> typeToTemplate;
 
+	@Parameters(
+			arity = "1",
+			paramLabel = "batch",
+			description = "File with links"
+			)
+	private Path batch;
+
+	@Option(
+			names = { "-s", "--sleep" },
+			paramLabel = "sleep",
+			description = "seconds to wait" )
+	private int sleepSeconds = 5;
+
 	/** @param args */
 	public static void main( String[] args )
 	{
-		final String here = cl +"m ";
-		/*
-		read file
-		for line in file
-			assemble process string
-			execute
-			if bad exit code
-				add to complaint list
-		*/
-		if ( args.length < 1 )
-		{
-			System.err.println( here +"first argument is a filepath with links in it" );
-			return;
-		}
-		List<String> links;
-		try
-		{
-			links = Files.readAllLines( Paths.get( args[ 0 ] ) );
-		}
-		catch ( IOException ie )
-		{
-			System.err.println( here +"couldn't get lines of "+ args[ 0 ]
-					+" because "+ ie );
-			return;
-		}
-		int sleepSeconds = 5;
-		if ( args.length > 1 )
-			sleepSeconds = Integer.valueOf( args[ 1 ] );
-		RunYd notCurl = new RunYd();
-		notCurl.download( links, sleepSeconds );
+		int exitCode = new CommandLine( new RunYd() ).execute( args );
+		System.exit( exitCode );
 	}
 
 
 	public RunYd()
 	{
-		fillTemplate( "" );
+		fillTemplate();
 	}
 
 
-	private void fillTemplate( String mappingFile )
+	private void fillTemplate()
 	{
-		final String here = cl +"ft ";
-		if ( mappingFile == null || mappingFile.isEmpty() )
+		if ( batch == null )
 		{
 			typeToTemplate = new HashMap<>();
 			typeToTemplate.put( "&", "%(uploader)s yt %(upload_date)s %(title)s i" ); // youtube playlist
@@ -71,16 +66,42 @@ public class RunYd
 			typeToTemplate.put( "s", "%(uploader)s sc %(upload_date)s %(title)s.%(ext)s\"" ); // soundcloud
 			typeToTemplate.put( "n", "%(uploader)s ng %(id)s %(title)s.%(ext)s\"" ); // newgrounds ; mp3, needn"t -f
 		}
+		// else parse file for type to template
+	}
+
+
+	public void run()
+	{
+		final String here = cl +"r ";
+		List<String> links;
+		try
+		{
+			links = Files.readAllLines( batch );
+		}
+		catch ( IOException ie )
+		{
+			System.err.println( here +"couldn't get lines of "+ batch
+					+" because "+ ie );
+			return;
+		}
+		download( links, sleepSeconds );
 	}
 
 
 	public void download( List<String> links, int sleepSeconds )
 	{
+		/*
+		read file
+		for line in file
+			assemble process string
+			execute
+			if bad exit code
+				add to complaint list
+		*/
 		final String here = cl +"d ";
 		final int linkInd = 0;
 		// COPYPASTA from run_dl.py
 		final int y_dl = 0, sleep = y_dl +1, b_dl = sleep +1;
-		System.out.println( here +"os "+ System.getProperty( "os.name" ) );
 		String[] command = { "youtube-dl -o \"",
 							String.format( " --sleep-interval %d ", sleepSeconds ),
 		         			"python3 /usr/local/sbin/bc_dl --base-dir=m"

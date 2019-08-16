@@ -1,0 +1,10 @@
+
+Run_Ydl
+
+Copyright Nicholas Prado (aka Nzen), released under terms of What The Fuck Public (WTFP) license, as described at www.wtfpl.net.
+
+Run_Ydl relies on  
+* picocli, which is copyright released under Apache v2.0 license terms.
+* Enohar, which is copyright released under MIT license terms.
+
+Run_Ydl implicitly relies on the runtime existence of youtube-dl, which is copyright released under Unlicense terms or the public domain.

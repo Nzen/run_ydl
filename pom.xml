@@ -18,7 +18,7 @@
 		RunYd
 		</artifactId>
 	<version>
-		0.1
+		1.0+j8
 		</version>
 	<description>
 		Feeds links to youtube-dl
@@ -37,6 +37,30 @@
 			</license>
 		</licenses>
 	<dependencies>
+		<dependency>
+	    	<!-- parse args -->
+			<groupId>
+				info.picocli
+				</groupId>
+			<artifactId>
+				picocli
+				</artifactId>
+			<version>
+				4.0.2
+				</version>
+			</dependency>
+		<dependency>
+	    	<!-- parse config file -->
+			<groupId>
+				ws.nzen.format.eno
+				</groupId>
+			<artifactId>
+				enohar
+				</artifactId>
+			<version>
+				0.0-alpha.6.0+j8
+				</version>
+			</dependency>
 		<!--
 		<dependency>
 			<groupId>
@@ -59,97 +83,24 @@
 	<build>
 	    <plugins>
 			<plugin>
-			    <!-- path to java 9+ jdk -->
+	    		<!-- tell maven we're using utf8 files -->
 				<groupId>
 					org.apache.maven.plugins
 					</groupId>
 				<artifactId>
-					maven-toolchains-plugin
+					maven-resources-plugin
 					</artifactId>
 				<version>
-					1.1
+					2.7
 					</version>
 				<configuration>
-					<toolchains>
-						<jdk>
-							<version>
-    							<!-- [1.9,) -->
-    							<!-- or 9, depending on numbering convention -->
-								[1.8,)
-								</version>
-							</jdk>
-						</toolchains>
-					</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>
-								toolchain
-								</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-			<plugin>
-	    		<!-- compile with java v9+ -->
-				<groupId>
-					org.apache.maven.plugins
-					</groupId>
-				<artifactId>
-					maven-compiler-plugin
-					</artifactId>
-				<version>
-					3.8.0
-					</version>
-				<configuration>
-					<!-- For java 9+
-					<source>
-						1.11
-						</source>
-					<target>
-						1.11
-						</target>
-					<release>
-						11
-						</release>
-						-->
-					<!-- For java 8 holdouts -->
-						<source>
-							1.8
-							</source>
-						<target>
-							1.8
-							</target>
 					<encoding>
 						UTF-8
 						</encoding>
 					</configuration>
-				<!-- For java 8 holdouts ; remove for java 9+ -->
-				<executions>
-					<execution>
-						<id>
-							default-compile
-							</id>
-						<phase>
-							compile
-							</phase>
-						<configuration>
-							<excludes>
-								<exclude>
-									**/module-info.java
-									</exclude>
-								</excludes>
-							</configuration> 
-						<goals>
-							<goal>
-								compile
-								</goal>
-							</goals>
-						</execution>                  
-					</executions>
 				</plugin>
-	    	<plugin>
-	    		<!-- config for jar -->
+			<plugin>
+				<!-- config for project jar -->
 				<groupId>
 					org.apache.maven.plugins
 					</groupId>
@@ -163,25 +114,26 @@
 					<archive>
 						<index>
 							true
-						</index>
+							</index>
 						<manifest>
 							<addClasspath>
 								true
 								</addClasspath>
-							<mainClass>
-								ws.nzen.runtime.youtube_dl.RunYd
-								</mainClass>
 							</manifest>
 						<manifestEntries>
 							<mode>
 								development
 								</mode>
+							<Automatic-Module-Name>
+								<!-- perhaps move this to only java v8 profiles -->
+								ws.nzen.format.eno
+								</Automatic-Module-Name>
 							</manifestEntries>
 						</archive>
 					</configuration>
 				</plugin>
 		    <plugin>
-	    		<!-- make source jar -->
+				<!-- config for source jar -->
 				<groupId>
 					org.apache.maven.plugins
 					</groupId>
@@ -197,34 +149,514 @@
 							attach-sources
 							</id>
 						<goals>
-							<goal>
-								jar
-								</goal>
+						<goal>
+							jar-no-fork
+							</goal>
 							</goals>
 						</execution>
 					</executions>
 				</plugin>
 			<plugin>
-	    		<!-- skip tests -->
+				<!-- enable or disable tests -->
 				<groupId>
 					org.apache.maven.plugins
-					</groupId>
+				</groupId>
 				<artifactId>
 					maven-surefire-plugin
-					</artifactId>
+				</artifactId>
 				<version>
 					2.12.4
-					</version>
+				</version>
 				<configuration>
+					<!--
 					<skipTests>
 						true
-						</skipTests>
+					</skipTests>
+					 -->
 					</configuration>
 				</plugin>
 			</plugins>
 		</build>
+	<profiles>
+		<profile>
+			<!-- profile to compile as java 8 for local repo -->
+			<id>
+				j8
+				</id>
+			<activation>
+				<activeByDefault>
+					true
+					</activeByDefault>
+				</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- path to our java jdk -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-toolchains-plugin
+							</artifactId>
+						<version>
+							1.1
+							</version>
+						<configuration>
+							<toolchains>
+								<jdk>
+									<version>
+										[1.8]
+										</version>
+									</jdk>
+								</toolchains>
+							</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>
+										toolchain
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- compile with java 8 compliance -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-compiler-plugin
+							</artifactId>
+						<version>
+							3.8.0
+							</version>
+						<configuration>
+							<source>
+								1.8
+								</source>
+							<target>
+								1.8
+								</target>
+							<encoding>
+								UTF-8
+								</encoding>
+							<excludes>
+								<exclude>
+									module-info.java
+									</exclude>
+								</excludes>
+							</configuration>
+						</plugin>
+					</plugins>
+				</build>
+			</profile>
+		<profile>
+			<!-- profile to compile as java 11 for local repo -->
+			<id>
+				j11
+				</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- path to our java jdk -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-toolchains-plugin
+							</artifactId>
+						<version>
+							1.1
+							</version>
+						<configuration>
+							<toolchains>
+								<jdk>
+									<version>
+										[11,)
+										</version>
+									</jdk>
+								</toolchains>
+							</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>
+										toolchain
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- compile with java 11 compliance -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-compiler-plugin
+							</artifactId>
+						<version>
+							3.8.0
+							</version>
+						<configuration>
+							<source>
+								11
+								</source>
+							<target>
+								11
+								</target>
+							<release>
+								11
+								</release>
+							<encoding>
+								UTF-8
+								</encoding>
+							</configuration>
+						</plugin>
+					<plugin>
+						<!-- show the jdk modules used -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-jdeps-plugin
+							</artifactId>
+						<version>
+							3.1.1
+							</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>
+										jdkinternals
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						<!-- <configuration>
+							</configuration> -->
+						</plugin>
+					</plugins>
+				</build>
+			</profile>
+		<profile>
+			<!-- publish java 8 to maven -->
+			<id>
+				j8-r
+				</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- path to our java jdk -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-toolchains-plugin
+							</artifactId>
+						<version>
+							1.1
+							</version>
+						<configuration>
+							<toolchains>
+								<jdk>
+									<version>
+										[1.8]
+										</version>
+									</jdk>
+								</toolchains>
+							</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>
+										toolchain
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- compile with java 8 compliance -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-compiler-plugin
+							</artifactId>
+						<version>
+							3.8.0
+							</version>
+						<configuration>
+							<source>
+								1.8
+								</source>
+							<target>
+								1.8
+								</target>
+							<encoding>
+								UTF-8
+								</encoding>
+							<excludes>
+								<exclude>
+									module-info.java
+									</exclude>
+								</excludes>
+							</configuration>
+						</plugin>
+					<plugin>
+						<!-- config for javadoc jar -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-javadoc-plugin
+							</artifactId>
+						<version>
+							3.0.1
+							</version>
+						<configuration>
+							<sourceFileExcludes>
+								**/module-info.java
+								</sourceFileExcludes>
+							<doclint>
+								<!-- suppress javadoc linter -->
+								all,-missing
+								</doclint>
+							<encoding>
+								UTF-8
+								</encoding>
+							</configuration>
+						<executions>
+							<execution>
+								<id>
+									attach-javadocs
+									</id>
+								<goals>
+									<goal>
+										jar
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- sign the jars -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-gpg-plugin
+							</artifactId>
+						<version>
+							1.6
+							</version>
+						<executions>
+							<execution>
+								<id>
+									sign-artifacts
+									</id>
+								<phase>
+									verify
+									</phase>
+								<goals>
+									<goal>
+										sign
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- deploy releases to sonatype's server -->
+						<groupId>
+							org.sonatype.plugins
+							</groupId>
+						<artifactId>
+							nexus-staging-maven-plugin
+							</artifactId>
+						<version>
+							1.6.7
+							</version>
+						<extensions>
+							true
+							</extensions>
+						<configuration>
+							<serverId>
+								ossrh
+								</serverId>
+							<nexusUrl>
+								https://oss.sonatype.org/
+								</nexusUrl>
+							<autoReleaseAfterClose>
+								false
+								</autoReleaseAfterClose>
+							</configuration>
+						</plugin>
+					</plugins>
+				</build>
+			</profile>
+		<profile>
+			<!-- publish java 11 to maven -->
+			<id>
+				j11-r
+				</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- path to our java jdk -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-toolchains-plugin
+							</artifactId>
+						<version>
+							1.1
+							</version>
+						<configuration>
+							<toolchains>
+								<jdk>
+									<version>
+										[11,)
+										</version>
+									</jdk>
+								</toolchains>
+							</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>
+										toolchain
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- compile with java 11 compliance -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-compiler-plugin
+							</artifactId>
+						<version>
+							3.8.0
+							</version>
+						<configuration>
+							<source>
+								11
+								</source>
+							<target>
+								11
+								</target>
+							<release>
+								11
+								</release>
+							<encoding>
+								UTF-8
+								</encoding>
+							</configuration>
+						</plugin>
+					<plugin>
+						<!-- config for javadoc jar -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-javadoc-plugin
+							</artifactId>
+						<version>
+							3.0.1
+							</version>
+						<configuration>
+							<!--
+							<sourceFileExcludes>
+								**/module-info.java
+								</sourceFileExcludes>
+								-->
+							<doclint>
+								<!-- suppress javadoc linter -->
+								all,-missing
+								</doclint>
+							<encoding>
+								UTF-8
+								</encoding>
+							</configuration>
+						<executions>
+							<execution>
+								<id>
+									attach-javadocs
+									</id>
+								<goals>
+									<goal>
+										jar
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- sign the jars -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-gpg-plugin
+							</artifactId>
+						<version>
+							1.6
+							</version>
+						<executions>
+							<execution>
+								<id>
+									sign-artifacts
+									</id>
+								<phase>
+									verify
+									</phase>
+								<goals>
+									<goal>
+										sign
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- deploy releases to sonatype's server -->
+						<groupId>
+							org.sonatype.plugins
+							</groupId>
+						<artifactId>
+							nexus-staging-maven-plugin
+							</artifactId>
+						<version>
+							1.6.7
+							</version>
+						<extensions>
+							true
+							</extensions>
+						<configuration>
+							<serverId>
+								ossrh
+								</serverId>
+							<nexusUrl>
+								https://oss.sonatype.org/
+								</nexusUrl>
+							<autoReleaseAfterClose>
+								false
+								</autoReleaseAfterClose>
+							</configuration>
+						</plugin>
+					</plugins>
+				</build>
+			</profile>
+		</profiles>
 	<inceptionYear>
-		<!-- below is java implementation year, python inception 2015 -->
+		<!-- below is the java implementation year, python inception is 2015 -->
 		2019
 		</inceptionYear>
 	<developers>
@@ -248,4 +680,33 @@
 				</timezone>
 			</developer>
 		</developers>
+	<scm>
+		<connection>
+			scm:git:https://github.com/Nzen/run_ydl.git
+			</connection>
+		<developerConnection>
+			scm:git:ssh://github.com/Nzen/run_ydl
+			</developerConnection>
+		<url>
+			https://github.com/Nzen/run_ydl
+			</url>
+		</scm>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>
+				ossrh
+				</id>
+			<url>
+				https://oss.sonatype.org/content/repositories/snapshots
+				</url>
+			</snapshotRepository>
+		<repository>
+			<id>
+				ossrh
+			</id>
+			<url>
+				https://oss.sonatype.org/service/local/staging/deploy/maven2/
+			</url>
+			</repository>
+		</distributionManagement>
 	</project>
