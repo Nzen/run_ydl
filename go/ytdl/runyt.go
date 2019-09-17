@@ -2,6 +2,7 @@
 package ytdl
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,6 +10,78 @@ import (
 	"strings"
 )
 
+func Prep( jsonFilePath string ) Ytdl {
+	var original YtArgList
+	err := json.Unmarshal( []byte( entireFile( jsonFilePath ) ), &original )
+	if err != nil {
+		panic( fmt.Sprint(  "invalid json config %v", err ) )
+	}
+	return Ytdl { original.Flags }
+}
+
+func ( hasFormat *Ytdl ) DownloadFrom( args []string ) {
+	// NOTE prepping cache
+	arg_ind := make( map[ string ]int )
+	for ind, oneArg := range hasFormat.Styles {
+		arg_ind[ oneArg.Flag ] = ind
+	}
+	// NOTE prepping common args
+	var filename string
+	if len( args ) > 1 {
+		filename = args[ 1 ]
+	} else {
+		filename = "0.txt"
+	}
+	var ytdlName string
+	if osIsWindows() {
+		ytdlName = "youtube-dl.exe"
+	} else {
+		ytdlName = "youtube-dl"
+	}
+	lines := linesInFile( filename )
+	problems := make( []string, 2 )
+	for _, line := range lines {
+		if len( line ) == 0 {
+			continue
+		}
+		tabInd := strings.Index( line, "\t" )
+		var urlAndFlag string
+		if tabInd >= 0 {
+			urlAndFlag = line[ : tabInd ]
+		} else {
+			urlAndFlag = line
+		}
+		spaceInd := strings.Index( line, " " )
+		flag := urlAndFlag[ : spaceInd ]
+		url := urlAndFlag[ spaceInd : ]
+		formatInd, okness := arg_ind[ flag ]
+		if ! okness {
+			fmt.Println( "unhandled flag", flag )
+		}
+		theseArgs := hasFormat.Styles[ formatInd ].StaticArgs
+		allArgs := make( []string, len( theseArgs ) +1 )
+		for ind, one := range theseArgs {
+			allArgs[ ind ] = one
+		}
+		lastInd := len( allArgs ) -1
+		// allArgs[ lastInd -1 ] = "-s"
+		allArgs[ lastInd ] = url
+		process := exec.Command( ytdlName, allArgs... )
+		process.Stdout = os.Stdout
+		err := process.Run()
+		if err != nil {
+			problems = append( problems, line )
+		}
+	}
+	for _, currProblem := range problems {
+		if len( currProblem ) > 0 {
+			fmt.Println( "problem with :- ", currProblem )
+		}
+	}
+	
+}
+
+// @Deprecated
 func Run( args []string ) {
 	/*
 	get config
@@ -64,13 +137,16 @@ func Run( args []string ) {
 	}
 }
 
-func linesInFile( filePath string ) []string {
+func entireFile( filePath string ) string {
 	byteAr, err := ioutil.ReadFile( filePath )
 	if ( err != nil ) {
 		panic( fmt.Sprint(  "couldn't read file because %v", err ) )
 	}
-	entireText := string( byteAr )
-	return strings.Split( entireText, "\n" )
+	return string( byteAr )
+}
+
+func linesInFile( filePath string ) []string {
+	return strings.Split( entireFile( filePath ), "\n" )
 }
 
 // simple heuristic based
@@ -87,11 +163,8 @@ import (
 )
 
 func main() {
-	rYtdl()
-}
-
-func rYtdl() {
-	ytdl.Run( os.Args )
+	knower := ytdl.Prep( "yt_config.json" )
+	knower.DownloadFrom( os.Args )
 }
 	*/
 

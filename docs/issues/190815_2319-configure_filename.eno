@@ -28,6 +28,14 @@ comment author : Nicholas
 I think I'll use eno to configure it, or fall back to the hardcoded templates if the user doesn't specify any.
 -- comment
 
+## 190916 2223 cst
+
+comment author : Nicholas
+
+-- comment
+It would be nice to use enombra for the Go implementation, but that doesn't exist yet. So, I'll use json, as that's part of the standard library. I've written an example and provided the expected schema. Next, I'll need to provide a struct to reify it as. Then, I'll need to provide a struct to hold that one.
+-- comment
+
 
 
 

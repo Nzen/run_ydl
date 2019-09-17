@@ -1,0 +1,67 @@
+
+{
+	"$id" : "ws.nzen.game.adventure.mhc.client.key",
+	"$schema" : "http://json-schema.org/schema#",
+
+	"type" : "object",
+	"properties" :
+	{
+		"jschema" :
+		{
+			"type" : "string",
+			"const" : "nzws_ytdl"
+		},
+		"schemaVersion" :
+		{
+			"type" : "string",
+		},
+		"flags" :
+		{
+			"type" : "array",
+			"minItems" : 0,
+			"items" :
+			{
+				"type" : "object",
+				"properties" :
+				{
+					"desc" :
+					{
+						"type" : "string",
+					},
+					"flag" :
+					{
+						"type" : "string",
+					},
+					"staticArgs" :
+					{
+						"type" : "array",
+						"minItems" : 0,
+						"items" :
+						{
+							"type" : "string",
+						}
+					},
+				}
+			}
+		},
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

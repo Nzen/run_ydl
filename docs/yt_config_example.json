@@ -1,0 +1,27 @@
+{
+	"jschema" : "nzws_ytdl",
+	"schemaVersion" : "1.0",
+	"flags" :
+	[
+		{
+			"desc" : "youtube",
+			"flag" : "y",
+			"staticArgs" :
+			[
+				"-f",
+				"18",
+				"-o",
+				"%(uploader)s yt %(upload_date)s %(title)s.%(ext)s"
+			]
+		},
+		{
+			"desc" : "newgrounds or default",
+			"flag" : "n",
+			"staticArgs" :
+			[
+				"-o",
+				"%(uploader)s ng %(upload_date)s %(id)s %(title)s.%(ext)s"
+			]
+		}
+	]
+}

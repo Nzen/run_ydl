@@ -7,7 +7,8 @@ import (
 )
 
 func main() {
-	ytdl.Run( os.Args )
+	knower := ytdl.Prep( "yt_config.json" )
+	knower.DownloadFrom( os.Args )
 }
 
 
