@@ -3,39 +3,26 @@
 		xmlns = "http://maven.apache.org/POM/4.0.0"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<!--
+	<mavenVersion>
+		3.6.0
+		</mavenVersion>
+		-->
 	<modelVersion>
 		4.0.0
 		</modelVersion>
-	<!--
-	<mavenVersion>
-		3.5.2
-		</mavenVersion>
-		-->
 	<groupId>
-		ws.nzen.runtime
+		ws.nzen.runtime.youtube
 		</groupId>
 	<artifactId>
-		RunYd
+		runydl
 		</artifactId>
 	<version>
-		1.0+j8
+		2.0-j11
 		</version>
-	<description>
-		Feeds links to youtube-dl
-		</description>
-	<name>
-		RunYd
-		</name>
-	<licenses>
-		<license>
-			<name>
-				WTFPL v1.0
-				</name>
-			<url>
-				www.wtfpl.net
-				</url>
-			</license>
-		</licenses>
+	<packaging>
+		jar
+		</packaging>
 	<dependencies>
 		<dependency>
 	    	<!-- parse args -->
@@ -58,7 +45,7 @@
 				enohar
 				</artifactId>
 			<version>
-				0.0-alpha.6.0+j8
+				0.0-alpha.8.0+j8-SNAPSHOT
 				</version>
 			</dependency>
 		<!--
@@ -75,11 +62,12 @@
 			</dependency>
 			-->
 		</dependencies>
-	<properties>
-		<project.build.sourceEncoding>
-			UTF-8
-			</project.build.sourceEncoding>
-		</properties>
+	<!--
+		parent
+		dependencyManagement
+		modules
+		properties
+		-->
 	<build>
 	    <plugins>
 			<plugin>
@@ -99,8 +87,51 @@
 						</encoding>
 					</configuration>
 				</plugin>
+		    <plugin>
+	    		<!-- make source jar -->
+				<groupId>
+					org.apache.maven.plugins
+					</groupId>
+				<artifactId>
+					maven-source-plugin
+					</artifactId>
+				<version>
+					3.0.1
+					</version>
+				<executions>
+					<execution>
+						<id>
+							attach-sources
+							</id>
+						<goals>
+							<goal>
+								jar
+								</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 			<plugin>
-				<!-- config for project jar -->
+		    	<!-- skip tests without remembering -DskipTests -->
+				<groupId>
+					org.apache.maven.plugins
+					</groupId>
+				<artifactId>
+					maven-surefire-plugin
+					</artifactId>
+				<version>
+					2.12.4
+					</version>
+				<configuration>
+					<!--
+					<skipTests>
+						true
+						</skipTests>
+						-->
+					</configuration>
+				</plugin>
+	    	<plugin>
+	    		<!-- config for jar -->
 				<groupId>
 					org.apache.maven.plugins
 					</groupId>
@@ -119,64 +150,255 @@
 							<addClasspath>
 								true
 								</addClasspath>
+							<mainClass>
+								ws.nzen.runtime.youtube_dl.RunYd
+								</mainClass>
 							</manifest>
 						<manifestEntries>
 							<mode>
 								development
 								</mode>
+							<st-version>
+								${project.version}
+								</st-version>
 							<Automatic-Module-Name>
-								<!-- perhaps move this to only java v8 profiles -->
-								ws.nzen.format.eno
+								ws.nzen.runtime.youtube.runyd
 								</Automatic-Module-Name>
 							</manifestEntries>
 						</archive>
 					</configuration>
 				</plugin>
-		    <plugin>
-				<!-- config for source jar -->
+			<plugin>
+				<!-- Prep a zip with all relevant files -->
 				<groupId>
 					org.apache.maven.plugins
 					</groupId>
 				<artifactId>
-					maven-source-plugin
+					maven-assembly-plugin
 					</artifactId>
 				<version>
-					3.0.1
+					3.1.1
 					</version>
 				<executions>
 					<execution>
-						<id>
-							attach-sources
-							</id>
+						<phase>
+							package
+							</phase>
 						<goals>
-						<goal>
-							jar-no-fork
-							</goal>
+							<goal>
+								single
+								</goal>
 							</goals>
+						<configuration>
+							<appendAssemblyId>
+								false
+								</appendAssemblyId>
+							<descriptors>
+								<descriptor>
+									src/main/assembly/zip.xml
+									</descriptor>
+								</descriptors>
+							</configuration>
 						</execution>
 					</executions>
 				</plugin>
 			<plugin>
-				<!-- enable or disable tests -->
+				<!-- Check license compatibility with dependencies -->
+				<groupId>
+					org.codehaus.mojo
+					</groupId>
+				<artifactId>
+					license-maven-plugin
+					</artifactId>
+				<version>
+					2.0.0
+					</version>
+				<executions>
+					<execution>
+						<id>
+							affirm-other-licenses
+							</id>
+						<goals>
+							<goal>
+								add-third-party
+								</goal>
+							</goals>
+						<configuration>
+							<encoding>
+								UTF-8
+								</encoding>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+	<!--
+	disabled outside of home; move to a profile
+			<plugin>
+				<!- - sign the jar itself - ->
 				<groupId>
 					org.apache.maven.plugins
-				</groupId>
+					</groupId>
 				<artifactId>
-					maven-surefire-plugin
-				</artifactId>
+					maven-jarsigner-plugin
+					</artifactId>
 				<version>
-					2.12.4
-				</version>
+					3.0.0
+					</version>
+				<executions>
+					<execution>
+						<id>
+							sign
+							</id>
+						<goals>
+							<goal>
+								sign
+								</goal>
+							</goals>
+						</execution>
+					<execution>
+						<id>
+							verify
+							</id>
+						<goals>
+							<goal>
+								verify
+								</goal>
+							</goals>
+						</execution>
+					</executions>
 				<configuration>
-					<!--
-					<skipTests>
-						true
-					</skipTests>
-					 -->
+					<keystore>
+						../191207_self.pks
+						</keystore>
+					<alias>
+						selfsigned
+						</alias>
+					<storepass>
+						{67NpMzkKDlEHdt+zHoSQLGwpT36EB554VsliU/pY6rR1mULM3Xc6Ahg2bycRa6e8}
+						</storepass>
+					</configuration>
+				</plugin>
+		-->
+			<plugin>
+	    		<!-- maven is able to start splaintime -->
+				<groupId>
+					org.codehaus.mojo
+					</groupId>
+				<artifactId>
+					exec-maven-plugin
+					</artifactId>
+				<version>
+					1.6.0
+					</version>
+				<configuration>
+					<executable>
+						java
+						</executable>
+					<mainClass>
+						ws.nzen.runtime.youtube_dl.RunYd
+						</mainClass>
+					<arguments>
+						<argument>
+							-classpath
+							</argument>
+						<argument>
+							ws.nzen.runtime.youtube_dl.RunYd
+							</argument>
+					</arguments>
 					</configuration>
 				</plugin>
 			</plugins>
 		</build>
+	<!--
+		reporting
+		-->
+	<name>
+		RunYdl
+		</name>
+	<description>
+		Feeds links to youtube-dl
+		</description>
+	<url>
+		https://github.com/Nzen/run_ydl
+		</url>
+	<inceptionYear>
+		<!-- below is the java implementation year, python inception is 2015 -->
+		2019
+		</inceptionYear>
+	<licenses>
+		<license>
+			<name>
+				WTFPL v1.0
+				</name>
+			<url>
+				www.wtfpl.net
+				</url>
+			</license>
+		</licenses>
+	<!--
+		organization
+		-->
+	<developers>
+		<developer>
+			<id>
+				nzen
+				</id>
+			<name>
+				Nicholas Prado
+				</name>
+			<email>
+				nmprado@nzen.ws
+				</email>
+			<roles>
+				<role>
+					Implementor
+					</role>
+				</roles>
+			<timezone>
+				UTC-06:00
+				</timezone>
+			</developer>
+		</developers>
+	<!--
+		contributors
+		ssueManagement
+		ciManagement
+		mailingLists
+		-->
+	<scm>
+		<connection>
+			scm:git:https://github.com/Nzen/run_ydl.git
+			</connection>
+		<developerConnection>
+			scm:git:ssh://github.com/Nzen/run_ydl
+			</developerConnection>
+		<url>
+			https://github.com/Nzen/run_ydl
+			</url>
+		</scm>
+	<!--
+		prerequisites
+		repositories
+		pluginRepositories
+		-->
+	<distributionManagement>
+		<snapshotRepository>
+			<id>
+				ossrh
+				</id>
+			<url>
+				https://oss.sonatype.org/content/repositories/snapshots
+				</url>
+			</snapshotRepository>
+		<repository>
+			<id>
+				ossrh
+				</id>
+			<url>
+				https://oss.sonatype.org/service/local/staging/deploy/maven2/
+				</url>
+			</repository>
+		</distributionManagement>
 	<profiles>
 		<profile>
 			<!-- profile to compile as java 8 for local repo -->
@@ -314,8 +536,8 @@
 								</encoding>
 							</configuration>
 						</plugin>
-					<plugin>
-						<!-- show the jdk modules used -->
+				<!--	<plugin>
+						 show the jdk modules used 
 						<groupId>
 							org.apache.maven.plugins
 							</groupId>
@@ -334,14 +556,79 @@
 									</goals>
 								</execution>
 							</executions>
-						<!-- <configuration>
-							</configuration> -->
+						</plugin>	-->
+					</plugins>
+				</build>
+			</profile>
+		<profile>
+			<!-- profile to compile as latest java for local repo -->
+			<id>
+				jL
+				</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- path to our java jdk -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-toolchains-plugin
+							</artifactId>
+						<version>
+							1.1
+							</version>
+						<configuration>
+							<toolchains>
+								<jdk>
+									<version>
+										[13,)
+										</version>
+									</jdk>
+								</toolchains>
+							</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>
+										toolchain
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- compile with java 11 compliance -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-compiler-plugin
+							</artifactId>
+						<version>
+							3.8.0
+							</version>
+						<configuration>
+							<source>
+								13
+								</source>
+							<target>
+								13
+								</target>
+							<release>
+								13
+								</release>
+							<encoding>
+								UTF-8
+								</encoding>
+							</configuration>
 						</plugin>
 					</plugins>
 				</build>
 			</profile>
 		<profile>
 			<!-- publish java 8 to maven -->
+			<!-- invoke with mvn -P j8-r deploy -->
 			<id>
 				j8-r
 				</id>
@@ -414,11 +701,13 @@
 							maven-javadoc-plugin
 							</artifactId>
 						<version>
-							3.0.1
+							3.1.1
 							</version>
 						<configuration>
 							<sourceFileExcludes>
+								<exclude>
 								**/module-info.java
+									</exclude>
 								</sourceFileExcludes>
 							<doclint>
 								<!-- suppress javadoc linter -->
@@ -654,59 +943,205 @@
 					</plugins>
 				</build>
 			</profile>
+		<profile>
+			<!-- publish java latest version to maven -->
+			<id>
+				jL-r
+				</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- path to our java jdk -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-toolchains-plugin
+							</artifactId>
+						<version>
+							1.1
+							</version>
+						<configuration>
+							<toolchains>
+								<jdk>
+									<version>
+										[13,)
+										</version>
+									</jdk>
+								</toolchains>
+							</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>
+										toolchain
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- compile with java 11 compliance -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-compiler-plugin
+							</artifactId>
+						<version>
+							3.8.0
+							</version>
+						<configuration>
+							<source>
+								13
+								</source>
+							<target>
+								13
+								</target>
+							<release>
+								13
+								</release>
+							<encoding>
+								UTF-8
+								</encoding>
+							</configuration>
+						</plugin>
+					<plugin>
+						<!-- config for javadoc jar -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-javadoc-plugin
+							</artifactId>
+						<version>
+							3.0.1
+							</version>
+						<configuration>
+							<!--
+							<sourceFileExcludes>
+								**/module-info.java
+								</sourceFileExcludes>
+								-->
+							<doclint>
+								<!-- suppress javadoc linter -->
+								all,-missing
+								</doclint>
+							<encoding>
+								UTF-8
+								</encoding>
+							</configuration>
+						<executions>
+							<execution>
+								<id>
+									attach-javadocs
+									</id>
+								<goals>
+									<goal>
+										jar
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- sign the jars -->
+						<groupId>
+							org.apache.maven.plugins
+							</groupId>
+						<artifactId>
+							maven-gpg-plugin
+							</artifactId>
+						<version>
+							1.6
+							</version>
+						<executions>
+							<execution>
+								<id>
+									sign-artifacts
+									</id>
+								<phase>
+									verify
+									</phase>
+								<goals>
+									<goal>
+										sign
+										</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					<plugin>
+						<!-- deploy releases to sonatype's server -->
+						<groupId>
+							org.sonatype.plugins
+							</groupId>
+						<artifactId>
+							nexus-staging-maven-plugin
+							</artifactId>
+						<version>
+							1.6.7
+							</version>
+						<extensions>
+							true
+							</extensions>
+						<configuration>
+							<serverId>
+								ossrh
+								</serverId>
+							<nexusUrl>
+								https://oss.sonatype.org/
+								</nexusUrl>
+							<autoReleaseAfterClose>
+								false
+								</autoReleaseAfterClose>
+							</configuration>
+						</plugin>
+					</plugins>
+				</build>
+			</profile>
 		</profiles>
-	<inceptionYear>
-		<!-- below is the java implementation year, python inception is 2015 -->
-		2019
-		</inceptionYear>
-	<developers>
-		<developer>
-			<id>
-				Nzen
-				</id>
-			<name>
-				Nicholas Prado
-				</name>
-			<email>
-				nmprado@nzen.ws
-				</email>
-			<roles>
-				<role>
-					Implementor
-					</role>
-				</roles>
-			<timezone>
-				UTC-06:00
-				</timezone>
-			</developer>
-		</developers>
-	<scm>
-		<connection>
-			scm:git:https://github.com/Nzen/run_ydl.git
-			</connection>
-		<developerConnection>
-			scm:git:ssh://github.com/Nzen/run_ydl
-			</developerConnection>
-		<url>
-			https://github.com/Nzen/run_ydl
-			</url>
-		</scm>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>
-				ossrh
-				</id>
-			<url>
-				https://oss.sonatype.org/content/repositories/snapshots
-				</url>
-			</snapshotRepository>
-		<repository>
-			<id>
-				ossrh
-			</id>
-			<url>
-				https://oss.sonatype.org/service/local/staging/deploy/maven2/
-			</url>
-			</repository>
-		</distributionManagement>
 	</project>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

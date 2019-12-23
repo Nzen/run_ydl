@@ -3,7 +3,17 @@
 
 == Unreleased
 
-== [[1.0]] - 2019-08-15
+== [2.0] - 2019-12-22
+
+=== Added
+
+* Depends on enohar
+
+=== Changed
+
+* honors (eno) config argument, and thence flags besides hardcoded youtube
+
+== [1.0] - 2019-08-15
 
 === Added
 
@@ -17,13 +27,13 @@
 
 No longer reports the OS when starting a run.
 
-== [[0.1]] - 2019-01-29
+== [0.1] - 2019-01-29
 
 === Added
 
 * Able to specify seconds of sleep as a second argument.
 
-== [[0.0]] - 2019-06-22
+== [0.0] - 2019-06-22
 
 === Added
 

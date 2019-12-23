@@ -1,0 +1,25 @@
+
+eno schema : nzws_ytdl
+
+schema version : 1.0
+
+# flags
+
+	## yt
+
+	desc : youtube
+	flag : y
+	static args :
+		- -f
+		- 18
+		- -o
+		- %(uploader)s yt %(upload_date)s %(title)s.%(ext)s
+
+	## whatever
+
+	desc : newgrounds or default
+	flag : n
+	static args :
+		- -o
+		- %(uploader)s %(upload_date)s %(title)s.%(ext)s
+
